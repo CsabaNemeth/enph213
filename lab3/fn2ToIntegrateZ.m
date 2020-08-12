@@ -1,0 +1,39 @@
+function [val] = fn2ToIntegrateZ(phi, z)
+%Integrand Value [val] = fn2ToIntegrateZ(phi, z)
+%Written By: Csaba Nemeth
+%
+%fn2ToIntegrateZ takes two vector arguments:
+% phi -> Angular position along magnet.
+% z -> height along magnet.
+%
+%The function returns an integrand in the z direction that can be used to integrate the force
+%between the two magnets. This is done by calculating the magnetic field
+%componenet across all phi and z using a for loop, and storing the field in
+%a 2-D array "val".
+
+%Initialize and import required global variables.
+setupGlobalVariables();
+global R K
+
+%Initialize return array with dimensions (rows, cols) = z, phi.
+val = ones(length(z), length(phi));
+
+%Initiate nested for loop across all z and phi elements.
+for m = 1:length(z)
+    for n = 1:length(phi)
+        
+        %For each z, phi combination calculate x, y and z points.
+        x1 = R*cos(phi(m, n));
+        y1 = R*sin(phi(m, n));
+        z1 = z(m, n);
+        
+        %Calcualte x-component and y-component of the magnetic field.
+        [Bx, By, ~] = B(x1, y1, z1);
+        
+        %Append the integrand into the val 2-D array.
+        val(m, n) = R*((K*sin(phi(m, n))*By)+(K*cos(phi(m, n))*Bx));
+        
+    end %end inner loop
+end %end outer loop
+
+end %End function.
